@@ -16,31 +16,32 @@ Demo para clase de CI/CD: una app simple de **liquidación de sueldos**, dividid
 │   │   ├── test_liquidacion.py        # Tests unitarios
 │   │   └── test_api_integration.py    # Tests de integración (TestClient)
 │   ├── requirements.txt
-│   └── render.yaml          # Definición declarativa del servicio en Render
 │
 ├── frontend/                 # UI React + Vite
 │   └── src/
 │       ├── App.jsx
 │       └── index.css
-│
-├── netlify.toml              # Config de build para Netlify
-│
-└── .github/workflows/
-    ├── backend.yml           # CI/CD del backend → Render
-    └── frontend.yml          # CI/CD del frontend → Netlify
 ```
 
 ## Cómo correr localmente
 
 ### Backend
 
+Con UV:  
+```bash
+cd backend
+uv syncpip install -r requirements.txt
+uv run uvicorn app.main:app --reload --port 8000
+```
+
+Con pip:  
 ```bash
 cd backend
 pip install -r requirements.txt
 uvicorn app.main:app --reload --port 8000
 ```
 
-Tests:
+Tests (habiendo cargado el entorno):
 
 ```bash
 cd backend
@@ -57,25 +58,6 @@ npm run dev
 ```
 
 ## Pipelines de GitHub Actions
-
-Hay **dos workflows independientes**, cada uno disparado solo por cambios en su carpeta
-(usando `paths:`), para simular dos equipos/servicios que se despliegan por separado.
-
-### `backend.yml`
-1. **test**: instala dependencias y corre `pytest` (unitarios + integración).
-2. **deploy** (solo en push a `main`, y solo si los tests pasan): dispara un
-   **Deploy Hook** de Render vía `curl`.
-
-### `frontend.yml`
-1. **build**: instala dependencias, corre `lint`, y hace `npm run build`.
-2. **deploy** (solo en push a `main`): vuelve a buildear con la URL de producción de la
-   API y publica el resultado en Netlify usando la action `nwtgck/actions-netlify`.
-
-> **Por qué disparar el deploy desde Actions y no usar el auto-deploy nativo de
-> Render/Netlify:** ambas plataformas pueden auto-deployar al conectar el repo
-> directamente, pero eso dejaría a GitHub Actions corriendo solo los tests, sin mostrar
-> el "CD" del pipeline. Para la demo es más ilustrativo que el propio workflow sea quien
-> dispara el deploy.
 
 ## Setup de secrets y variables necesarios
 
@@ -95,8 +77,8 @@ Hay **dos workflows independientes**, cada uno disparado solo por cambios en su 
 1. Crear un **Web Service** nuevo, conectado al repo (o usando `backend/render.yaml`
    como Blueprint).
 2. Root directory: `backend`.
-3. Build command: `pip install -r requirements.txt`.
-4. Start command: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`.
+3. Build command: `pip install -r requirements.txt` o `uv sync`.
+4. Start command: `uvicorn app.main:app --host 0.0.0.0 --port $PORT` o `uv run`.
 5. Copiar el **Deploy Hook** y guardarlo como secret en GitHub.
 
 ### En Netlify
