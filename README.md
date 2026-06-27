@@ -4,6 +4,8 @@ Demo para clase de CI/CD: una app simple de **liquidación de sueldos**, dividid
 **backend (FastAPI)** y **frontend (React + Vite)**, con pipelines independientes en
 **GitHub Actions** que corren tests/build y despliegan a **Render** (API) y **Netlify** (UI).
 
+[![Tests](https://github.com/tinxo/IS3-Demo-ci-cd/actions/workflows/python-test.yml/badge.svg)](https://github.com/tinxo/IS3-Demo-ci-cd/actions/workflows/python-test.yml)
+
 ## Estructura
 
 ```
